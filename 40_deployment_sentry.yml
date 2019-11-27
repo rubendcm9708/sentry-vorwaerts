@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentry
+  namespace: sentry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentry
+      component: services
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: sentry
+        component: services
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: sentry
+          persistentVolumeClaim:
+            claimName: sentry
+
+      containers:
+      - name: sentry-server
+        image: sentry
+        env:
+          - name: SENTRY_SECRET_KEY
+            value: "0m+je22lc+wy&g@e94c8cv8-h4j-o#ran5b5u7n6pyac!v0h*a"
+          - name: SENTRY_REDIS_HOST
+            value: sentry-redis.sentry
+        imagePullPolicy: Always
+        ports:
+        - name: sentry
+          containerPort: 9000
+        volumeMounts:
+         - name: sentry
+           mountPath: /opt/sentry
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 90
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 90
+          periodSeconds: 10
+
+      - name: sentry-cron
+        image: sentry
+        env:
+          - name: SENTRY_SECRET_KEY
+            value: "0m+je22lc+wy&g@e94c8cv8-h4j-o#ran5b5u7n6pyac!v0h*a"
+          - name: SENTRY_REDIS_HOST
+            value: sentry-redis.sentry
+        command: [ "sentry run cron" ]
+        imagePullPolicy: Always
+        volumeMounts:
+         - name: sentry
+           mountPath: /opt/sentry
+
+      - name: sentry-worker
+        image: sentry
+        env:
+          - name: SENTRY_SECRET_KEY
+            value: "0m+je22lc+wy&g@e94c8cv8-h4j-o#ran5b5u7n6pyac!v0h*a"
+          - name: SENTRY_REDIS_HOST
+            value: sentry-redis.sentry
+        command: [ "sentry run worker" ]
+        imagePullPolicy: Always
+        volumeMounts:
+         - name: sentry
+           mountPath: /opt/sentry

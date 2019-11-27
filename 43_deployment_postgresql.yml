@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentry-postgresql
+  namespace: sentry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: database
+      app: postgresql
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        component: database
+        app: postgresql
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: sentry-postgresql
+        persistentVolumeClaim:
+          claimName: sentry-postgresql
+
+      containers:
+      - name: sentry-postgresql
+        image: postgres
+        env:
+          - name: POSTGRES_USER
+            value: "sentry"
+          - name: POSTGRES_PASSWORD
+            value: "secret"
+        ports:
+        - name: postgresql
+          containerPort: 5432
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: sentry-postgresql
+          mountPath: /var/lib/postgresql
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 60
+          periodSeconds: 10

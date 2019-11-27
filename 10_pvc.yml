@@ -1,0 +1,41 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sentry
+  namespace: sentry
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10G
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sentry-redis
+  namespace: sentry
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10G
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sentry-postgresql
+  namespace: sentry
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10G

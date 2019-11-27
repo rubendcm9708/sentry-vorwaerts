@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentry-redis
+  namespace: sentry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      component: cache
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        component: cache
+    spec:
+      terminationGracePeriodSeconds: 10
+
+      containers:
+      - name: sentry-redis
+        image: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+        imagePullPolicy: Always
+        readinessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 10
+          periodSeconds: 10
