@@ -24,12 +24,22 @@ spec:
 
       containers:
       - name: sentry-server
-        image: sentry
+        image: sentry:latest
         env:
           - name: SENTRY_SECRET_KEY
             value: "0m+je22lc+wy&g@e94c8cv8-h4j-o#ran5b5u7n6pyac!v0h*a"
           - name: SENTRY_REDIS_HOST
             value: sentry-redis.sentry
+          - name: SENTRY_REDIS_PORT
+            value: '6379'
+          - name: SENTRY_POSTGRES_HOST
+            value: sentry-postgresql.sentry
+          - name: SENTRY_POSTGRES_PORT
+            value: '5432'
+          - name: SENTRY_DB_USER
+            value: 'sentry'
+          - name: SENTRY_DB_PASSWORD
+            value: 'secret'            
         imagePullPolicy: Always
         ports:
         - name: sentry
@@ -41,37 +51,79 @@ spec:
           httpGet:
             path: /
             port: 9000
-          initialDelaySeconds: 90
+          initialDelaySeconds: 150
           periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /
             port: 9000
-          initialDelaySeconds: 90
+          initialDelaySeconds: 150
           periodSeconds: 10
+        lifecycle:
+            postStart:
+              exec:
+                command: ["/usr/local/bin/sentry", "upgrade"]
 
       - name: sentry-cron
-        image: sentry
+        image: sentry:latest
         env:
           - name: SENTRY_SECRET_KEY
             value: "0m+je22lc+wy&g@e94c8cv8-h4j-o#ran5b5u7n6pyac!v0h*a"
           - name: SENTRY_REDIS_HOST
             value: sentry-redis.sentry
-        command: [ "sentry run cron" ]
+          - name: SENTRY_REDIS_PORT
+            value: '6379'
+          - name: SENTRY_POSTGRES_HOST
+            value: sentry-postgresql.sentry
+          - name: SENTRY_POSTGRES_PORT
+            value: '5432'
+          - name: SENTRY_DB_USER
+            value: 'sentry'
+          - name: SENTRY_DB_PASSWORD
+            value: 'secret'   
         imagePullPolicy: Always
         volumeMounts:
          - name: sentry
            mountPath: /opt/sentry
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 240
+          periodSeconds: 10
+        lifecycle:
+            postStart:
+              exec:
+                command: ["/usr/local/bin/sentry", "run", "cron"]
 
       - name: sentry-worker
-        image: sentry
+        image: sentry:latest
         env:
           - name: SENTRY_SECRET_KEY
             value: "0m+je22lc+wy&g@e94c8cv8-h4j-o#ran5b5u7n6pyac!v0h*a"
           - name: SENTRY_REDIS_HOST
             value: sentry-redis.sentry
-        command: [ "sentry run worker" ]
+          - name: SENTRY_REDIS_PORT
+            value: '6379'
+          - name: SENTRY_POSTGRES_HOST
+            value: sentry-postgresql.sentry
+          - name: SENTRY_POSTGRES_PORT
+            value: '5432'
+          - name: SENTRY_DB_USER
+            value: 'sentry'
+          - name: SENTRY_DB_PASSWORD
+            value: 'secret'   
         imagePullPolicy: Always
         volumeMounts:
          - name: sentry
            mountPath: /opt/sentry
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9000
+          initialDelaySeconds: 240
+          periodSeconds: 10
+        lifecycle:
+            postStart:
+              exec:
+                command: ["/usr/local/bin/sentry", "run", "worker"]
