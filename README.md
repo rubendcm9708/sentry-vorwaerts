@@ -33,7 +33,7 @@
 
   **note**: This is done manually because the service is going to ask the user if he wants to create a user, so type yes and pass user email and password.  
 
-1. Check for the entry point for the sentry-server and access the host in your web browser of preference:  
+1. Check for the entry point for the sentry-server and access the host in your web browser of preference. Finally, config the requested values by sentry:  
 `service sentry-server -n sentry --url`
 
 ## References
