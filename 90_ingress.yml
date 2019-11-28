@@ -11,5 +11,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: sentry
+          serviceName: sentry-server
           servicePort: 9000

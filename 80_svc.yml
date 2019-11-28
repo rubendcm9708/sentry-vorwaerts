@@ -2,20 +2,57 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: sentry
+  name: sentry-server
   namespace: sentry
   labels:
-    app: sentry
+    app: sentry-server
     component: services
 spec:
   ports:
-  - name: sentry
+  - port: 80
+    targetPort: 9000
+  selector:
+    app: sentry-server
+    component: services
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.1.56
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: sentry-cron
+  namespace: sentry
+  labels:
+    app: sentry-cron
+    component: services
+spec:
+  ports:
+  - name: sentry-cron
     port: 9000
   selector:
-    app: sentry
+    app: sentry-cron
     component: services
   type: NodePort
-
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: sentry-worker
+  namespace: sentry
+  labels:
+    app: sentry-worker
+    component: services
+spec:
+  ports:
+  - name: sentry-worker
+    port: 9000
+  selector:
+    app: sentry-worker
+    component: services
+  type: NodePort
 ---
 kind: Service
 apiVersion: v1
