@@ -38,4 +38,4 @@
 
 ## References
 1. https://hub.docker.com/_/sentry/
-1. https://docs.sentry.io/server/installation/docker/
+1. https://docs.sentry.io/server/installation/
