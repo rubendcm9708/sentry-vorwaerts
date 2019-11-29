@@ -25,6 +25,15 @@
 1. Check the pod status until it is running:  
 `kubectl get pods -n sentry`  
 
+1. Edit the 80_svc.yml file, in the first service definition change the ingress IP for the load balancer with your minikube IP. You can use `minikube ip` to see your IP:
+```
+(...)
+status:
+  loadBalancer:
+    ingress:
+    - ip: <MINIKUBE IP HERE>
+```
+
 1. Then access the shell for the container running in the *sentry-server* pod, copy the pod name and replace:  
 `kubectl exec -n sentry -it <sentry-server-podname> -- /bin/bash `  
 
@@ -33,7 +42,7 @@
 
   **note**: This is done manually because the service is going to ask the user if he wants to create a user, so type yes and pass user email and password.  
 
-1. Check for the entry point for the sentry-server and access the host in your web browser of preference. Finally, config the requested values by sentry:  
+11. Check for the entry point for the sentry-server and access the host in your web browser of preference. Finally, config the requested values by sentry:  
 `service sentry-server -n sentry --url`
 
 ## References
